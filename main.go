@@ -19,7 +19,7 @@ var (
 	serverAddr = flag.String("server_addr", "localhost:11000", "The server address in the format of host:port")
 )
 
-func proxyGRPC(backendAddr string) (*httputil.ReverseProxy, error) {
+func proxyGRPC(backendAddr string, r *http.Request) (*httputil.ReverseProxy, error) {
 	proxy := &httputil.ReverseProxy{
 		Director: func(r *http.Request) {
 			r.URL.Scheme = "https"
@@ -30,6 +30,14 @@ func proxyGRPC(backendAddr string) (*httputil.ReverseProxy, error) {
 				return net.Dial(network, addr)
 			},
 		},
+		ModifyResponse: func(res *http.Response) error {
+			log.Printf("%s %s => %s %d", r.Method, r.URL, backendAddr, res.StatusCode)
+			return nil
+		},
+		ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
+			log.Print(err)
+			http.Error(w, "Internal server error", http.StatusInternalServerError)
+		},
 	}
 	return proxy, nil
 }
@@ -39,7 +47,7 @@ func main() {
 
 	router := mux.NewRouter()
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		p, err := proxyGRPC(*serverAddr)
+		p, err := proxyGRPC(*serverAddr, r)
 		if err != nil {
 			log.Print(err)
 			http.Error(w, "Internal server error", http.StatusInternalServerError)
