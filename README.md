@@ -1,5 +1,5 @@
 # grpc-proxy
-gRPC proxy written in Go
+HTTP/2 reverse proxy library for routing to gRPC microservices
 
 ### Usage
 
