@@ -1,5 +1,5 @@
 # grpc-proxy
-gRPC proxy written in go
+gRPC proxy written in Go
 
 ### Usage
 
