@@ -1,5 +1,5 @@
 # grpc-proxy
-HTTP/2 reverse proxy library for routing to gRPC microservices
+HTTP/2 reverse proxy for routing to gRPC microservices
 
 ### Usage
 
